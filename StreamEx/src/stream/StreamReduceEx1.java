@@ -52,5 +52,7 @@ public class StreamReduceEx1 {
 		
 		//Optional에서는 값을 꺼낼때 get을 사용한다.
 		
+		//이건 테스트 한번더
+		
 	}
 }
