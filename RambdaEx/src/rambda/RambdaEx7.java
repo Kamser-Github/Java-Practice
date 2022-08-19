@@ -23,13 +23,13 @@ public class RambdaEx7 {
 //		Object f3 = (Object)(()->{});
 		//이식의 유형은 인터페이스만 가능하다고 알려준다.
 		//마지막 문장이 그래서 가능햇던것
-		String str = ((Object)(MyFunction1)(()->{})).toString();
+		String str2 = ((Object)(MyFunction1)(()->{})).toString();
 		//익명 객체라서 구현했던 MyFunction에 변환하고
 		//다시 인터페이스도 Object로 형변환이 가능하니까 돌리고
 		//결국 1차로 인터페이스로 형변환을 명시적으로 한다면
 		// 그뒤는 다 가능하다는것.
 		System.out.println(f);
 		System.out.println(obj);
-		System.out.println(str);
+		System.out.println(str2);
 	}
 }
