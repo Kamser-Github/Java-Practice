@@ -30,7 +30,7 @@ public class FileOutputSteamEx01 {
 		System.out.println(outFile1.exists());//false //없다고 나온다
 		//파일 객체로 OutputStream을 만들어보기
 		// 프로그램에서 -> 파일로 가는게 out이다
-		OutputStream os1 = new FileOutputStream(outFile1);
+		OutputStream os1 = new FileOutputStream(outFile1,true);
 		//os1 변수에는 FileOutputStream 객체의 주소가 있고
 		//그 객체 주소에는 변수로 filePath가 들어있다.
 		//os1의 오버라이딩된것을 사용하면
@@ -51,7 +51,7 @@ public class FileOutputSteamEx01 {
 		
 		//실험으로 만약에 상위 폴더가 없는 폴더라면 어떻게 될까
 		File outFile2 = new File("src/kr/filetxt/OutOnlyEng.txt");
-//		OutputStream os2= new FileOutputStream(outFile2);
+		OutputStream os2= new FileOutputStream(outFile2);
 		//해당 폴더를 찾을수 없다고 에러가 발생한다.
 		//이럴때 객체의 주소는 실제 있어야하는 주소가 들어가야한다.
 		//그럼 File메서드 중에서 부모의 주소를 가져올수가 있는데
@@ -77,7 +77,7 @@ public class FileOutputSteamEx01 {
 			 */
 			String str = sc.nextLine();
 			korWord = str.getBytes();
-//			os2.write(korWord);
+			os2.write(korWord);
 			//강아지는귀엽고깜직하 까지 입력을 했더니 됐다.
 			//여기서 엔터도 인식하게 하려면...
 			//next()를 사용해야한다.
@@ -119,12 +119,14 @@ public class FileOutputSteamEx01 {
 		//그러면 반복문을 돌려서 -1을 나올때까지하는데
 		//여기서 byte단위는 3단위로읽어야한다.
 		int cnt = 0;
-		while((cnt=is1.read(korWord))!=-1) {
+		while(is1.read(korWord)!=-1) {
 			//korWord에 읽은 데이터값이 저장.
 			//그걸 다시 조합
+			is1.read(korWord);
 			String str = new String(korWord,Charset.defaultCharset());
 			System.out.print(str);
 			System.out.println("count = "+cnt);
+			korWord=new byte[3];
 		}
 		//읽어올때 에러가 생긴다..
 		/*
@@ -134,5 +136,6 @@ public class FileOutputSteamEx01 {
 		 * ASCII면 read로 읽고.
 		 * 그 외면 read(byte[]로 읽고)
 		 */
+		
 	}
 }
