@@ -1,154 +1,213 @@
 package mini;
 
-import java.io.*;
-import java.util.*;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.LineNumberReader;
+import java.util.Random;
+import java.util.Scanner;
 
 public class SchoolTable {
 	public static void main(String[] args) {
+/*
+		1. 정렬할 기준이 있는 compareTo<T>,
+		2. 중복을 체크할 equals
+			내부에서 한번 확인
+		3. toString
+		4. 생성자.
+		5. 상수
+		6. 파일 쓰기,읽기 - 처음에 파일없으면 만들어서 읽기
+		7. 파일 초기화.
+		8. 중복찾으면 인덱스반환,
+		9. 중복찾으면 누적카운트반환,
+		10.랜덤번호 생성.(null주의)
+		11.배열 추가
+		12.배열 삭제
+		13.출력 
+*/
 		Ezen aa = new Ezen("C:/Users/yousd/Desktop/Ezen");
 		aa.run();
 	}
 }
-
-interface checkOverLapable {
-	boolean compareTo(Object obj);
+interface Comparable<T> {
+	public int compareTo(T t);
 }
-interface savable {
-	String getInfo();
+interface TakeOutable {
+	public String getData();
 }
-class Student implements checkOverLapable,savable{
-	int id;
-	String name;
-
-	Student(int id, String name) {
-		this.id = id;
-		this.name = name;
+interface Inputable<T> {
+	public T getInstance(String[] arr);
+}
+class Student implements Comparable<Student> ,TakeOutable,Inputable<Student> {
+	static int no = 1;
+	int studentID;
+	String studentName;
+	
+	Student(){
+		this(0,"이름없음"+no);
+		Student.no++;
 	}
-
+	Student(int studentID,String studentName){
+		this.studentID = studentID;
+		this.studentName = studentName;
+	}
 	@Override
 	public String toString() {
-		return String.format("학생번호:%4d 학생명:%4s\n", id, name);
+		return String.format("학생번호:%4d 학생명:%4s\n",studentID,studentName);
 	}
-
 	@Override
-	public boolean compareTo(Object obj) {
-		if (this == obj) {
+	public String getData() {
+		return String.format("%d,%s",studentID,studentName);
+	}
+	@Override
+	public boolean equals(Object obj) {
+		if(this == obj) {
 			return true;
-		} else if (obj == null) {
+		}
+		else if(obj instanceof Student) {
+			return this.studentName.equals(((Student)obj).studentName);
+		}
+		else if(obj instanceof String) {
+			return this.studentName.equals((String)obj);
+		}
+		else
 			return false;
+	}
+	@Override
+	public int compareTo(Student student) {
+		return this.studentName.compareTo(student.studentName);
+	}
+	@Override
+	public Student getInstance(String[] arr) {
+		if(arr.length==2) {
+			int id = Integer.parseInt(arr[0]);
+			return new Student(id,arr[1]);
 		}
-		if (obj instanceof Student) {
-			Student tmp = (Student) obj;
-			return this.name.equals(tmp.name);
-		}
-		return false;
-	}
-	public int compareTo(String name) {
-		return this.name.compareTo(name);
-	}
-	public int compareTo(int id) {
-		return this.id - id ;
-	}
-	public String getInfo() {
-		return String.format("%d,%s",id,name);
+		else
+			return new Student();
 	}
 }
 
-class Subject implements checkOverLapable,savable{
+class Subject implements Comparable<Subject> ,TakeOutable ,Inputable<Subject> {
+	static int no=1;
 	int subjectID;
 	String subjectName;
-
+	
+	Subject(){
+		this(0,"이름없음"+no);
+		Subject.no++;
+	}
 	Subject(int subjectID, String subjectName) {
 		this.subjectID = subjectID;
 		this.subjectName = subjectName;
 	}
-	
 	@Override
 	public String toString() {
 		return String.format("과목번호:%4d 과목명:%4s\n", subjectID, subjectName);
 	}
-
 	@Override
-	public boolean compareTo(Object obj) {
-		if (this == obj) {
-			return true;
-		} else if (obj == null) {
-			return false;
-		}
-		if (obj instanceof Subject) {
-			Subject tmp = (Subject) obj;
-			return this.subjectName.equals(tmp.subjectName);
-		}
-		return false;
-	}
-	public int compareTo(String name) {
-		return this.subjectName.compareTo(name);
-	}
-	public int compareTo(int id) {
-		return this.subjectID - id ;
-	}
-	public String getInfo() {
+	public String getData() {
 		return String.format("%d,%s",subjectID,subjectName);
+	}
+	@Override
+	public boolean equals(Object obj) {
+		if(this == obj) {
+			return true;
+		}
+		else if (obj instanceof Subject) {
+			return this.subjectName.equals(((Subject)obj).subjectName);
+		}
+		else if(obj instanceof String) {
+			return this.subjectName.equals((String)obj);
+		}
+		else 
+			return false;
+	}
+	@Override
+	public int compareTo(Subject subject) {
+		return this.subjectName.compareTo(subject.subjectName);
+	}
+	@Override
+	public Subject getInstance(String[] arr) {
+		if(arr.length==2) {
+			int id = Integer.parseInt(arr[0]);
+			return new Subject(id,arr[1]);
+		}
+		else
+			return new Subject();
 	}
 }
 
-class Grade implements checkOverLapable,savable{
+class Score implements Comparable<Score> ,TakeOutable ,Inputable<Score>{
+	static int no = 1;
 	String studentName;
 	String subjectName;
 	int score;
-
-	Grade(Student student, Subject subject, int score) {
-		this.studentName = student.name;
-		this.subjectName = subject.subjectName;
-		this.score = score;
+	
+	Score(){
+		this("이름없음"+Score.no,"이름없음"+Score.no,0);
+		Score.no++;
 	}
-	Grade(String studentName, String subjectName, int score){
+	Score(String studentName, String subjectName, int score){
 		this.studentName = studentName;
 		this.subjectName = subjectName;
 		this.score = score;
 	}
 	@Override
 	public String toString() {
-		return String.format("이름:%4s 과목:%3s %3d점\n", studentName, subjectName, score);
+		return String.format("이름:%3s 과목:%2s %3d점\n", studentName, subjectName, score);
 	}
-
 	@Override
-	public boolean compareTo(Object obj) {
-		System.out.println("진입 1!");
-		if (this == obj) {
+	public String getData() {
+		return String.format("%s,%s,%d",studentName,subjectName,score);
+	}
+	@Override
+	public boolean equals(Object obj) {
+		if(this == obj) {
 			return true;
-		} else if (obj == null) {
-			return false;
 		}
-		if (obj instanceof Grade) {
-			Grade tmp = (Grade) obj;
-			return this.subjectName.equals(tmp.subjectName) && this.studentName.equals(tmp.studentName);
-		} else if (obj instanceof Student) {
-			System.out.println("진입");
-			return this.studentName.equals(((Student) obj).name);
-		} else if (obj instanceof Subject) {
-			return this.subjectName.equals(((Subject) obj).subjectName);
+		else if(obj instanceof Score) {
+			boolean student = this.studentName.equals(((Score)obj).studentName);
+			boolean subject = this.subjectName.equals(((Score)obj).subjectName);
+			return student&&subject;
+		}
+		else
+			return false;
+	}
+	@Override
+	public int compareTo(Score score) {
+		if(this.score-score.score>0) {
+			return -1;
+		}
+		else if(this.score-score.score==0) {
+			return this.studentName.compareTo(score.studentName);
+		}
+		else {
+			return 1;
+		}
+	}
+	public boolean equalsTo(Object obj) {
+		if(obj instanceof Student)
+			return this.studentName.equals(((Student)obj).studentName);
+		else if(obj instanceof Subject) {
+			return this.studentName.equals(((Subject)obj).subjectName);
 		}
 		return false;
 	}
-	public int compareTo(Grade grade) {
-		if(this.score - grade.score>0)
-			return 1;
-		else if(this.score - grade.score<0)
-			return -1;
+	@Override
+	public Score getInstance(String[] arr) {
+		if(arr.length==3) {
+			int id = Integer.parseInt(arr[2]);
+			return new Score(arr[0],arr[1],id);
+		}
 		else
-			return 0;
-	}
-	public int compareTo(Student student) {
-		return this.studentName.compareTo(student.name);
-	}
-	public int compareTo(Subject subject) {
-		return this.subjectName.compareTo(subject.subjectName);
-	}
-	public String getInfo() {
-		return String.format("%s,%s,%d",studentName,subjectName,score);
+			return new Score();
 	}
 }
+@SuppressWarnings("unchecked")
 class Ezen {
 	private static int no;
 	private final int INSERT = 1;
@@ -160,367 +219,285 @@ class Ezen {
 	private final int STUDENT = 1;
 	private final int SUBJECT = 2;
 	private final int SCORE = 3;
-	
-	Student[] students;
-	Subject[] subjects;
-	Grade[] grades;
-	File ezenFile;
-	String parentFolderAddr;
-	String[] table;
+	private final int PARENT_FOLDER_ADDR = 0;
+	private final int NOT_FIND = -1;
 	
 	Scanner sc = new Scanner(System.in);
 	Random ran = new Random();
-
+	
+	Student[] students;
+	Subject[] subjects;
+	Score[] scores;
+	String parentFolderAddr;
+	String[] tableAddr;
+	int[] checkID;
+	
+	File ezenFile;
+	FileWriter fw = null;
+	FileReader fr = null;
+	BufferedWriter bw = null;
+	BufferedReader br = null;
+	LineNumberReader lnr = null; 
+	
 	Ezen(String parentFolderAddr) {
 		this.students = new Student[0];
 		this.subjects = new Subject[0];
-		this.grades = new Grade[0];
-		this.table = new String[4];
+		this.scores = new Score[0];
+		this.tableAddr = new String[4];
 		this.parentFolderAddr = parentFolderAddr;
+		this.checkID = new int[10000];
 		tableInit();
-		loadEzen();
+		initFileEzen();
+		load();
 		Ezen.no++;
-		
 	}
 	void tableInit() {
-		this.table[0] = parentFolderAddr;
-		this.table[STUDENT] = "student"+no+".txt";
-		this.table[SUBJECT] = "subject"+no+".txt";
-		this.table[SCORE] = "score"+no+".txt";
+		this.tableAddr[PARENT_FOLDER_ADDR] = parentFolderAddr;
+		this.tableAddr[STUDENT] = "student"+no+".txt";
+		this.tableAddr[SUBJECT] = "subject"+no+".txt";
+		this.tableAddr[SCORE] = "score"+no+".txt";
 	}
-
-	String inputMessage(String message) {
-		System.out.println(message);
-		String str = sc.nextLine().replace(" ", "");
-		return str;
-	}
-	
-	void sortedInfo(Student[] stu,boolean isASC) {
-		Student max = null;
-		int maxIdx = 0;
-		int sortStand = isASC ? 1 : -1;
-		for(int i=0 ; i<stu.length ; i++) {
-			max = stu[i];
-			maxIdx = i;
-			for(int j=i-1 ; j>=0 ; j--) {
-				int sort = max.compareTo(stu[j].name)*sortStand;
-				if(sort>0) {
-					stu[j+1]=stu[j];
-					maxIdx = j;
-				}
-				stu[maxIdx]=max;
-			}
+	void fileExsistMkdir() {
+		ezenFile = new File(tableAddr[PARENT_FOLDER_ADDR]);
+		if(!ezenFile.exists()) {
+			ezenFile.mkdirs();
 		}
 	}
-
-	int findNameCnt(checkOverLapable[] obj, Object findObject) {
-		int cnt = 0;
-		for (int i = 0; i < obj.length; i++) {
-			if (obj[i] != null && obj[i].compareTo(findObject)) {
-				System.out.println(i);
-				cnt++;
-			}
-		}
-		return cnt;
+	void exsistCreateFile(int tableAddrNum) throws IOException {
+		ezenFile = new File(tableAddr[PARENT_FOLDER_ADDR],tableAddr[tableAddrNum]);
+		if(!ezenFile.exists()) ezenFile.createNewFile();
 	}
-
-	int findNameIdx(checkOverLapable[] obj, Object findObject) {
-		int Idx = -1;
-		for (int i = 0; i < obj.length; i++) {
-			if (obj[i] != null && obj[i].compareTo(findObject)) {
-				System.out.println(i);
-				Idx = i;
-			}
+	void initFileEzen() {
+		fileExsistMkdir();
+		try {
+			exsistCreateFile(STUDENT);
+			exsistCreateFile(SUBJECT);
+			exsistCreateFile(SCORE);
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
-		return Idx;
+		//로드 메서드
 	}
-
-	// 배열에서 없는 숫자 만드는 메서드
-	int makeRandomPrimaryKey(int range, checkOverLapable[] obj) {
-		if (range <= 0) {
-			return -1;
-		}
-		// 랜덤번호 생성
-		int ranID = 0;// ranID = ran.nextInt(9999);
-		for (int i = 0; i < 1; i++) {
-			ranID = ran.nextInt(range);
-			if (obj.length > 1) {
-				for (int j = 0; j < obj.length; j++) {
-					if (isCheckID(ranID, j, obj))
-						i--;
-				}
+	int getRandomID() {
+		int ranID = -1;
+		while(ranID == -1) {
+			ranID = ran.nextInt(checkID.length);
+			if(checkID[ranID]==0) {
+				checkID[ranID]++;
 			}
+			else
+				ranID = -1;
 		}
 		return ranID;
 	}
-
-	boolean isCheckID(int newID, int idx, checkOverLapable[] obj) {
-		return obj[idx].compareTo(newID);
+	<T> int findIndexOf(Comparable<T>[] arr,Object obj) {
+		int idx = -1;
+		for(int i=0 ; i<arr.length ; i++) {
+			if(arr[i].equals(obj)) {
+				idx = i;
+			}
+		}
+		return idx;
 	}
-
-	boolean isCheckRange(String name, int range) {
-		return range <= 0 || name.length() == 0;
+	<T> Inputable<T>[] castingExpandCapacity(Inputable<T> obj,int lineCnt){
+		Inputable<T>[] tmp = null;
+		if(obj instanceof Student) {
+			tmp = (Inputable<T>[]) new Student[lineCnt];
+		}
+		else if(obj instanceof Subject) {
+			tmp = (Inputable<T>[]) new Subject[lineCnt];
+		}
+		else if(obj instanceof Score) {
+			tmp = (Inputable<T>[]) new Score[lineCnt];
+		}
+		return tmp;
 	}
-
-	// 배열 추가
-	void addStudent(String name, int range) {
-		int findCnt = findNameCnt(students, new Student(0, name));
-		if (findCnt > 0 || name.length() == 0) {
-			System.out.println("다시 확인해주세요.");
+	<T> Comparable<T>[] castingExpandCapacity(Comparable<T> obj,int resizeNum){
+		Comparable<T>[] tmp = null;
+		if(obj instanceof Student) {
+			tmp = (Comparable<T>[]) new Student[this.students.length+resizeNum];
+		}
+		else if(obj instanceof Subject) {
+			tmp = (Comparable<T>[]) new Subject[this.subjects.length+resizeNum];
+		}
+		else if(obj instanceof Score) {
+			tmp = (Comparable<T>[]) new Score[this.scores.length+resizeNum];
+		}
+		return tmp;
+	}
+	<T> Comparable<T>[] bringType(Comparable<T> obj) {
+		Comparable<T>[] tmp = null;
+		if(obj instanceof Student) {
+			tmp = (Comparable<T>[]) this.students;
+		}
+		else if(obj instanceof Subject) {
+			tmp = (Comparable<T>[]) this.subjects;
+		}
+		else if(obj instanceof Score) {
+			tmp = (Comparable<T>[]) this.scores;
+		}
+		return tmp;
+	}
+	<T> T[] add(Comparable<T> obj) {
+		Comparable<T>[] tmp = castingExpandCapacity(obj,1);
+		Comparable<T>[] ezentmp = bringType(obj);
+		for(int i=0 ; i<ezentmp.length ; i++) {
+			tmp[i] = ezentmp[i];
+		}
+		tmp[ezentmp.length]=obj;
+		ezentmp = tmp;
+		return (T[])ezentmp;
+	}
+	<T> T[]  update(Comparable<T> obj,boolean updateData) {
+		Comparable<T>[] ezentmp = bringType(obj);
+		int idx = findIndexOf(ezentmp, obj);
+		if(idx==-1) {
+			ezentmp = (Comparable<T>[]) add(obj);
+		}
+		else if(updateData){
+			ezentmp[idx] = null;
+			ezentmp[idx] = obj;
 		}
 		else {
-			if (isCheckRange(name, range)) {
-				System.err.println("문자의 길이나 범위를 확인해주세요.");
-			} else {
-				// 학생 추가
-				Student[] tmp = new Student[students.length + 1];
-				if (tmp.length > 1) {
-					for (int i = 0; i < students.length; i++) {
-						tmp[i] = students[i];
-					}
-				}
-				// 랜덤번호 생성
-				System.out.println("삭제후 학생 : " + students.length);
-				int ranID = makeRandomPrimaryKey(range, students);
-				tmp[students.length] = new Student(ranID, name);
-				students = tmp;
+			System.out.println("다시 확인 바랍니다.");
+		}
+		printTable(ezentmp);
+		return (T[])ezentmp;
+	}
+	void printTable(Object[] objs) {
+		for(int i=0 ; i<objs.length ; i++) {
+			System.out.println(objs[i]);
+		}
+	}
+	String reseiveData(String message) {
+		if(message.length()<1) return null;
+		System.out.println(message);
+		return sc.nextLine().replace(" ", "");
+	}
+	<T> int removeData(Comparable<T> constructor,Object searchObj) {
+		Comparable<T>[] ezenTmp = bringType(constructor);
+		int nullCnt = 0;
+		System.out.println("ezenTmp length : "+ezenTmp[0]);
+		for(int i=0 ; i<ezenTmp.length ; i++) {
+			if(checkEquals(ezenTmp,i,searchObj)) {
+				System.out.println("점수 제거");
+				ezenTmp[i] = null;
+				nullCnt++;
 			}
 		}
+		return nullCnt;
 	}
-
-	// 과목추가
-	void addSubject(String name, int range) {
-		int findCnt = findNameCnt(subjects, new Subject(0, name));
-		if (findCnt > 0 || name.length() == 0) {
-			System.out.println("중복입니다.");
+	<T> boolean checkEquals(Comparable<T>[] objArr,int idx,Object obj){
+		if(objArr instanceof Student[]) {
+			return ((Student[])objArr)[idx].equals(obj);
 		}
-		else{
-			if (isCheckRange(name, range)) {
-				System.err.println("문자의 길이나 범위를 확인해주세요.");
-			} else {
-				// 과목 추가
-				Subject[] tmp = new Subject[subjects.length + 1];
-				for (int i = 0; i < subjects.length; i++) {
-					tmp[i] = subjects[i];
-				}
-				// 랜덤번호 생성
-				int ranID = makeRandomPrimaryKey(range, subjects);
-				tmp[subjects.length] = new Subject(ranID, name);
-				subjects = tmp;
-			}
+		else if(objArr instanceof Subject[]) {
+			return ((Subject[])objArr)[idx].equals(obj);
 		}
-	}
-
-	// 점수추가
-	void addScore(String studentName, String subjectNmae, int score) {
-		int stuIdx = findNameIdx(students, new Student(0, studentName));
-		// 과목이 있는지
-		int subIdx = findNameIdx(subjects, new Subject(0, subjectNmae));
-		System.out.println(stuIdx + ":" + subIdx);
-		if (stuIdx >= 0 && subIdx >= 0) {// 둘다 있는경우
-			// 이미 있는지 확인
-			Student testStudent = students[stuIdx];
-			Subject testSubject = subjects[subIdx];
-			int Idx = findNameIdx(grades, new Grade(testStudent, testSubject, score));
-			if (Idx == -1) {// 새 점수 추가.
-				Grade[] tmp = new Grade[grades.length + 1];
-				for (int i = 0; i < grades.length; i++) {
-					tmp[i] = grades[i];
-				}
-				tmp[grades.length] = new Grade(testStudent, testSubject, score);
-				grades = tmp;
-			} else {
-				grades[Idx] = new Grade(testStudent, testSubject, score);
-			}
-			System.out.println(Arrays.toString(grades));
-		} else {
-			System.out.println("학생명이나 과목명을 다시 확인해주세요.");
+		else if(objArr instanceof Score[]) {
+			return ((Score[])objArr)[idx].equalsTo(obj);
 		}
-	}
-
-	void deleteScore(checkOverLapable obj) {
-		if (obj instanceof Student) {
-			deleteStudentScores(((Student) obj).name);
-		} else if (obj instanceof Subject) {
-			deleteSubjectScores(((Subject) obj).subjectName);
-		} else {
-			System.out.println("학생,과목만 들어올수 있습니다.");
-		}
-	}
-
-	void ReduceScoresOfNull(int delCnt) {
-		// 새 배열
-		int tmpIdx = 0;
-		Grade[] tmp = new Grade[grades.length - delCnt];
-		for (int i = 0; i < grades.length; i++) {
-			if (grades[i] != null) {
-				tmp[tmpIdx++] = grades[i];
-			}
-		}
-		grades = tmp;
-	}
-
-	void deleteStudentScores(String studentName) {
-		int delCnt = 0;
-		for (int i = 0; i < grades.length; i++) {
-			if (grades[i].studentName.equals(studentName)) {
-				delCnt++;
-				grades[i] = null;
-			}
-		}
-		if(delCnt>0) ReduceScoresOfNull(delCnt);
-		else System.out.println("해당 정보가 없습니다.");
-	}
-
-	void deleteSubjectScores(String subjectName) {
-		int delCnt = 0;
-		for (int i = 0; i < grades.length; i++) {
-			if (grades[i].subjectName.equals(subjectName)) {
-				delCnt++;
-				grades[i] = null;
-			}
-		}
-		if(delCnt>0) ReduceScoresOfNull(delCnt);
-		else System.out.println("해당 정보가 없습니다.");
-	}
-	
-	// 학생삭제
-	boolean deleteData(checkOverLapable[] arr, Object deleteDate) {
-		int idx = findNameIdx(arr, deleteDate);
-		if(idx==-1) {
-			System.out.println("해당 정보가 없습니다.");
+		else
 			return false;
-		}
-		arr[idx] = null;
+	}
+	<T> T[] reduceArray(Comparable<T> constructor,int nullCnt) {
+		Comparable<T>[] tmp 	= castingExpandCapacity(constructor,-nullCnt); 
+		Comparable<T>[] ezentmp = bringType(constructor);
 		int tmpIdx = 0;
-		checkOverLapable[] tmp = new Student[0];
-		if (arr instanceof Student[]) {
-			tmp = new Student[arr.length - 1];
-		} else if (arr instanceof Subject[]) {
-			tmp = new Subject[arr.length - 1];
-		}
-		for (int i = 0; i < arr.length; i++) {
-			if (arr[i] != null) {
-				tmp[tmpIdx++] = arr[i];
+		for(int i=0 ; i<ezentmp.length ; i++) {
+			if(ezentmp[i]!=null) {
+				tmp[tmpIdx++]=ezentmp[i];
 			}
 		}
-		if (arr instanceof Student[]) {
-			students = (Student[]) tmp;
-		} else if (arr instanceof Subject[]) {
-			subjects = (Subject[]) tmp;
-		}
-		System.out.println("데이터가 삭제되었습니다.");
-		return true;
+		ezentmp = tmp;
+		return  (T[]) ezentmp;
 	}
-	void printTableInfo(checkOverLapable[] tables) {
-		for (int i = 0; i < tables.length; i++) {
-			System.out.println(tables[i]);
+	void deleteStudent(String str) {
+		int nullCnt = removeData(new Score(),new Student(0,str));
+		scores = reduceArray(new Score(), nullCnt);
+		nullCnt = removeData(new Student(), new Student(0,str));
+		students = reduceArray(new Student(), nullCnt);
+	}
+	void deleteSubject(String str) {
+		int nullCnt = removeData(new Score(),new Subject(0,str));
+		scores = reduceArray(new Score(), nullCnt);
+		nullCnt = removeData(new Subject(), new Subject(0,str));
+		subjects = reduceArray(new Subject(), nullCnt);
+	}
+	<T> void sort(Comparable<T>[] obj,boolean isASC) {
+		Comparable<T> max = null;
+		int maxIdx = 0;
+		int sort = isASC ? 1 : -1;
+		for(int i=0 ; i<obj.length ; i++) {
+			max = obj[i];//1
+			maxIdx = i;//0
+			for(int j=i-1; j>=0 ; j--) {
+				if(max.compareTo((T)obj[j])*sort>0) {
+					obj[j+1]=obj[j];
+					maxIdx = j;
+				}
+			}
+			obj[maxIdx]=max;
 		}
 	}
-	void writeInfoToTable(savable[] saves,int tableNum,String fileName) throws IOException{
-		//파일
-		final int PARENT = 0;
-		ezenFile = new File(table[PARENT],table[tableNum]);
-		FileWriter fw = new FileWriter(ezenFile);
-		BufferedWriter bw = new BufferedWriter(fw);
-		for(int i=0; i<saves.length ; i++) {
-			bw.write(saves[i].getInfo());
-			if(i<saves.length-1)
+	void saveData(String parentAddr,String fileName,TakeOutable[] arr) throws IOException{
+		ezenFile = new File(parentAddr,fileName);
+		fw = new FileWriter(ezenFile);
+		bw = new BufferedWriter(fw);
+		for(int i=0 ; i<arr.length ; i++) {
+			bw.write(arr[i].getData());
+			if(i<arr.length-1)
 				bw.write("\n");
 		}
 		bw.close();
 		fw.close();
 	}
-	void saveEzenTable() {
+	void save() {
 		try {
-			mkdirParentFolder();
-			//학생 파일
-			writeInfoToTable(students,STUDENT,table[STUDENT]);
-			//과목 파일
-			writeInfoToTable(subjects,SUBJECT,table[SUBJECT]);
-			//성적 파일
-			writeInfoToTable(grades,SCORE,table[SCORE]);
-			System.out.println("저장성공");
-		}catch (IOException e) {
-			System.out.println("저장실패");
+			saveData(tableAddr[PARENT_FOLDER_ADDR],tableAddr[STUDENT],students);
+			saveData(tableAddr[PARENT_FOLDER_ADDR],tableAddr[SUBJECT],subjects);
+			saveData(tableAddr[PARENT_FOLDER_ADDR],tableAddr[SCORE],scores);
+		}catch(IOException e) {
 			e.printStackTrace();
 		}
 	}
-	int lineCount(String parant,String fileName) throws IOException{
-		ezenFile=new File(parant,fileName);
-		FileReader fr = new FileReader(ezenFile);
-		LineNumberReader lnr = new LineNumberReader(fr);
+	int lineCount(String parentAddr,String fileName) throws IOException{
+		ezenFile = new File(parentAddr,fileName);
+		fr = new FileReader(ezenFile);
+		lnr = new LineNumberReader(fr);
 		while(lnr.readLine()!=null);
-		int accountIdx = lnr.getLineNumber();
+		int lineCnt = lnr.getLineNumber();
 		lnr.close();
 		fr.close();
-		return accountIdx;
+		return lineCnt;
 	}
-	
-	void loadStudent() throws IOException {
-		int accountIdx = lineCount(this.table[0],this.table[STUDENT]);
-		FileReader fr = new FileReader(this.ezenFile);
-		BufferedReader br = new BufferedReader(fr);
-		this.students = new Student[accountIdx];
-		String[] initArr = new String[0];
-		while(accountIdx>0) {
-			int idx = this.students.length-accountIdx;
-			initArr = br.readLine().split(",");
-			this.students[idx]=new Student(Integer.parseInt(initArr[0]),initArr[1]);
-			accountIdx--;
+	<T> T[] loadData(Inputable<T> arr,int lineCnt) throws IOException {
+		fr = new FileReader(ezenFile);
+		br = new BufferedReader(fr);
+		Inputable<T>[] tmp = castingExpandCapacity(arr, lineCnt);
+		for(int i=0; i<lineCnt ; i++) {
+			tmp[i] = (Inputable<T>)arr.getInstance(br.readLine().split(","));
 		}
-		br.close();
-		fr.close();
+		fr = new FileReader(ezenFile);
+		br = new BufferedReader(fr);
+		return (T[])tmp;
 	}
-	void loadSubject() throws IOException {
-		int accountIdx = lineCount(this.table[0],this.table[SUBJECT]);
-		FileReader fr = new FileReader(this.ezenFile);
-		BufferedReader br = new BufferedReader(fr);
-		this.subjects = new Subject[accountIdx];
-		String[] initArr = new String[0];
-		while(accountIdx>0) {
-			int idx = this.subjects.length-accountIdx;
-			initArr = br.readLine().split(",");
-			this.subjects[idx]=new Subject(Integer.parseInt(initArr[0]),initArr[1]);
-			accountIdx--;
-		}
-		br.close();
-		fr.close();
-	}
-	void loadGrade() throws IOException {
-		int accountIdx = lineCount(table[0],table[SCORE]);
-		FileReader fr = new FileReader(ezenFile);
-		BufferedReader br = new BufferedReader(fr);
-		grades = new Grade[accountIdx];
-		String[] initArr = new String[0];
-		while(accountIdx>0) {
-			int idx = grades.length-accountIdx;
-			initArr = br.readLine().split(",");
-			grades[idx]=new Grade(initArr[0],initArr[1],Integer.parseInt(initArr[2]));
-			accountIdx--;
-		}
-		br.close();
-		fr.close();
-	}
-	void mkdirParentFolder() {
-		ezenFile = new File(table[0]);
-		if(!ezenFile.exists()) ezenFile.mkdirs();
-	}
-	void loadEzen() {
-		try{
-			
-			loadStudent();
-			loadSubject();
-			loadGrade();
-			System.out.println("읽기 성공");
-		} catch (IOException e) {
+	void load() {
+		try {
+			int lineCnt = lineCount(tableAddr[PARENT_FOLDER_ADDR],tableAddr[STUDENT]);
+			students = loadData(new Student(), lineCnt);
+			lineCnt = lineCount(tableAddr[PARENT_FOLDER_ADDR],tableAddr[SUBJECT]);
+			subjects = loadData(new Subject(), lineCnt);
+			lineCnt = lineCount(tableAddr[PARENT_FOLDER_ADDR],tableAddr[SCORE]);
+			scores = loadData(new Score(), lineCnt);
+			} catch(IOException e) {
 			e.printStackTrace();
-			System.out.println("읽기 실패");
 		}
 	}
-	void run() {
+	//////////////////////////////RUN
+	<T> void run() {
+		String[] savePoint = new String[3];
 		while (true) {
-			// menu print
 			System.out.println("= = = = =Ezen= = = = =");
 			System.out.println(" 1 > 추가 (학생,과목,성적)");
 			System.out.println(" 2 > 삭제 (학생,과목)");
@@ -537,25 +514,45 @@ class Ezen {
 				int insertSel = sc.nextInt();
 				if (insertSel == STUDENT) {// 학생 추가
 					sc.nextLine();
-					String studentName = inputMessage("학생이름을 입력해주세요.");
-					// 이름 중복검사
-					addStudent(studentName, 9999);
-					printTableInfo(students);
+					String str = reseiveData("학생명을 입력해주세요.");
+					savePoint[STUDENT] = str;
+					int ranID = this.getRandomID();
+					students = update(new Student(ranID,str),false);
 				} else if (insertSel == SUBJECT) {
 					sc.nextLine();
-					String subjectName = inputMessage("과목명을 입력해주세요.");
-					// 이름 중복검사
-					addSubject(subjectName, 9999);
-					printTableInfo(subjects);
+					String str = reseiveData("과목명을 입력해주세요.");
+					int idx = findIndexOf(subjects, str);
+					if(idx==-1) {
+						savePoint[SUBJECT] = str;
+						int ranID = this.getRandomID();
+						subjects = add(new Subject(ranID,str));
+						printTable(subjects);
+					}
+					else {
+						System.out.println("다시 확인해주세요.");
+					}
 				} else if (insertSel == SCORE) {
 					sc.nextLine();
-					int scoreTable = 0;
-					String[] contents = { "학생명", "과목명", "성적" };
-					for (int i = 0; i < contents.length; i++) {
-						contents[i] = inputMessage(contents[i] + "을 입력해주세요.");
+					System.out.println("학생명 : "+savePoint[STUDENT]);
+					System.out.println("과목명 : "+savePoint[SUBJECT]);
+					if(savePoint[STUDENT]!=null&&savePoint[SUBJECT]!=null) {
+						int score = Integer.parseInt(reseiveData("점수를 입력해주세요."));
+						scores = update(new Score(savePoint[STUDENT], savePoint[SUBJECT], score),true);
 					}
-					scoreTable = Integer.parseInt(contents[2]);
-					addScore(contents[STUDENT - 1], contents[SUBJECT - 1], scoreTable);
+					else {
+						savePoint[STUDENT]=reseiveData("학생명을 입력해주세요.");
+						savePoint[SUBJECT]=reseiveData("과목명을 입력해주세요.");
+						int score = Integer.parseInt(reseiveData("점수를 입력해주세요."));
+						int stuIdx = findIndexOf(this.students, new Student(0,savePoint[STUDENT]));
+						int subIdx = findIndexOf(this.subjects, new Subject(0,savePoint[SUBJECT]));
+						if(stuIdx==NOT_FIND||subIdx==NOT_FIND) {
+							System.out.println("학생명이나 과목명을 다시 확인해주세요.");
+						}
+						else {
+							scores = update(new Score(savePoint[STUDENT], savePoint[SUBJECT], score),true);
+						}
+					}
+					savePoint = new String[3];//초기화
 				}
 			} // if end
 			else if (sel == DELETE) {
@@ -563,46 +560,59 @@ class Ezen {
 				System.out.println(SUBJECT + " > 과목 삭제");
 				int deleteSel = sc.nextInt();
 				// 삭제
+				sc.nextLine();
 				if (deleteSel == STUDENT) {
-					sc.nextLine();
-					String name = inputMessage("학생명을 입력해주세요.");
-					deleteScore(new Student(0, name));
-					deleteData(students, new Student(0, name));
+					String str = reseiveData("학생명을 입력해주세요");
+					deleteStudent(str);
 				} else if (deleteSel == SUBJECT) {
-					sc.nextLine();
-					String name = inputMessage("과목명을 입력해주세요.");
-					deleteScore(new Student(0, name));
-					deleteData(subjects, new Subject(0, name));
+					String str = reseiveData("과목명을 입력해주세요");
+					deleteSubject(str); 
 				}
 			}
 			else if (sel == SORTED) {//정렬
-				//정렬기준 입력
-				//정렬 방법
-				sortedInfo(students,false);
-				printTableInfo(students);
+				System.out.println(STUDENT + " > 학생(이름) 정렬");
+				System.out.println(SUBJECT + " > 과목(이름) 정렬");
+				System.out.println(SCORE + " > 점수(성적) 정렬");
+				int sort = sc.nextInt();
+				System.out.println("1)오름차순    2)내림차순");
+				int asc = sc.nextInt();
+				boolean isASC = asc==1 ? true : false;
+				Comparable<T>[] tmp = null;
+				if(sort == STUDENT) {
+					tmp = (Comparable<T>[]) students;
+				}
+				else if(sort == SUBJECT) {
+					tmp = (Comparable<T>[]) subjects;
+				}
+				else if(sort == SCORE) {
+					tmp = (Comparable<T>[]) scores;
+				}
+				sort(tmp, isASC);
+				printTable(tmp);
 			}
 			else if (sel == PRINT) {
-				System.out.println(STUDENT + " > 학생 ");
-				System.out.println(SUBJECT + " > 과목 ");
-				System.out.println(SCORE + " > 점수 ");
-				int printSel = sc.nextInt();
-				if(printSel==STUDENT) {
-					printTableInfo(students);
+				System.out.println(STUDENT + " > 학생 출력");
+				System.out.println(SUBJECT + " > 과목 출력");
+				System.out.println(SCORE + " > 점수 출력");
+				int choice = sc.nextInt();
+				Comparable<T>[] tmp = null;
+				if(choice == STUDENT) {
+					tmp = (Comparable<T>[]) students;
 				}
-				else if(printSel==SUBJECT) {
-					printTableInfo(subjects);
+				else if(choice == SUBJECT) {
+					tmp = (Comparable<T>[]) subjects;
 				}
-				else if(printSel==SCORE) {
-					printTableInfo(grades);
+				else if(choice == SCORE) {
+					tmp = (Comparable<T>[]) scores;
 				}
+				printTable(tmp);
 			}
 			else if (sel == SAVE) {
-				saveEzenTable();
+				save();
 			}
 			else if (sel == LOAD) {
-				loadEzen();
+				load();
 			}
 		}//while
 	}// run() end
-
 }
